@@ -1,60 +1,97 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wp_test/models/task.dart';
 import 'package:wp_test/presentation/bloc/api_bloc/api_bloc.dart';
 import 'package:wp_test/presentation/bloc/api_bloc/api_event.dart';
 import 'package:wp_test/presentation/bloc/api_bloc/api_state.dart';
+import 'package:wp_test/presentation/widgets/input_field.dart';
+import 'package:wp_test/presentation/widgets/primary_button.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, required this.title});
+
+  final String title;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _inputController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _inputController.addListener(() {
+      context.read<ApiBloc>().add(ValidateUrl(url: _inputController.text));
+    });
+  }
+
+  @override
+  void dispose() {
+    _inputController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tasks'),
+        centerTitle: true,
+        title: Text(
+          '${widget.title} Screen',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: BlocBuilder<ApiBloc, ApiState>(
         builder: (context, state) {
-          if (state is ApiLoading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state is ApiSuccess<List<Task>>) {
-            final tasks = state.data;
-            return ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                final task = tasks[index];
-                return ListTile(
-                  title: Text('Task ID: ${task.id}'),
-                  subtitle: Text('Start: (${task.start.x}, ${task.start.y})'),
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/second',
-                    );
-                  },
-                );
-              },
-            );
-          } else if (state is ApiFailure) {
-            return Center(child: Text('Error: ${state.message}'));
-          } else {
-            return Center(child: Text('Press the button to fetch tasks.'));
+          String? errorText;
+          bool isButtonEnabled = false;
+
+          if (state is ApiUrlValidation) {
+            errorText = state.error;
+            isButtonEnabled = state.error == null;
           }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          BlocProvider.of<ApiBloc>(context).add(
-            FetchTasks(endpoint: 'https://flutter.webspark.dev/flutter/api'),
+
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: InputField(
+                      label: 'API URL',
+                      icon: Icons.link,
+                      controller: _inputController,
+                      validator: (value) {
+                        if (errorText != null) {
+                          return errorText;
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Spacer(),
+                  PrimaryButton(
+                    text: 'Start',
+                    //TODO: Remove this after implemented good validation in TextField
+                    onPressed: isButtonEnabled
+                        ? () {
+                            context.read<ApiBloc>().add(
+                                FetchTasks(endpoint: _inputController.text));
+
+                            Navigator.of(context).pushNamed('/process');
+                          }
+                        : null,
+                  ),
+                ],
+              ),
+            ),
           );
         },
-        child: Icon(Icons.download),
       ),
     );
   }

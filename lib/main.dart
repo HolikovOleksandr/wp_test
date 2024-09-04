@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wp_test/data/data_provider.dart';
 import 'package:wp_test/presentation/bloc/api_bloc/api_bloc.dart';
 import 'package:wp_test/presentation/bloc/task_cubit/task_cubit.dart';
 import 'package:wp_test/presentation/router/app_router.dart';
@@ -21,7 +20,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => TaskCubit()),
         BlocProvider(
           create: (context) => ApiBloc(
-            dataProvider: DataProvider(),
             taskCubit: TaskCubit(),
           ),
         ),
