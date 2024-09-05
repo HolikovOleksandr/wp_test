@@ -6,15 +6,11 @@ class InputField extends StatefulWidget {
     required this.label,
     required this.icon,
     required this.controller,
-    required this.validator,
-    this.onChanged,
   });
 
   final String label;
   final IconData icon;
   final TextEditingController controller;
-  final FormFieldValidator<String> validator;
-  final ValueChanged<String>? onChanged;
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -24,7 +20,6 @@ class _InputFieldState extends State<InputField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      validator: widget.validator,
       controller: widget.controller,
       decoration: InputDecoration(
         label: Text(widget.label),
@@ -52,7 +47,6 @@ class _InputFieldState extends State<InputField> {
           ),
         ),
       ),
-      onChanged: widget.onChanged,
     );
   }
 }

@@ -7,12 +7,12 @@ class AppRouter {
     switch (routeSettings.name) {
       case '/':
         return MaterialPageRoute(
-          builder: (_) => HomeScreen(title: 'Home',),
+          builder: (_) => HomeScreen(title: 'Home'),
         );
 
       case '/process':
         return MaterialPageRoute(
-          builder: (_) => ProcessScreen(),
+          builder: (_) => ProcessScreen(title: "Process"),
         );
 
       default:

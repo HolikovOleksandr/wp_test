@@ -21,39 +21,12 @@ class ApiBloc extends Bloc<ApiEvent, ApiState> {
         if (response.error) {
           emit(ApiFailure(message: response.message));
         } else {
-          taskCubit.setTasks(response.data);
-          emit(ApiSuccess<List<Task>>(data: response.data));
+          taskCubit.setTasks(response.data!);
+          emit(ApiSuccess<List<Task>>(data: response.data!));
         }
       } catch (e) {
         emit(ApiFailure(message: e.toString()));
       }
     });
-
-    on<ValidateUrl>((event, emit) async {
-      final error = _validateUrl(event.url);
-
-      if (error != null) {
-        emit(ApiUrlValidation(error: error));
-        return;
-      }
-
-      try {
-        final response = await DataProvider.getRequest(endpoint: event.url);
-
-        response.error
-            ? emit(ApiUrlValidation(error: response.message))
-            : emit(ApiUrlValidation(error: null));
-      } catch (e) {
-        emit(ApiUrlValidation(error: 'Failed to validate URL'));
-      }
-    });
-  }
-
-  String? _validateUrl(String url) {
-    final uri = Uri.tryParse(url);
-    if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
-      return 'Invalid URL format';
-    }
-    return null;
   }
 }

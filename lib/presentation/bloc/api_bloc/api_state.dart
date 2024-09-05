@@ -1,4 +1,3 @@
-// api_state.dart
 abstract class ApiState {}
 
 class ApiInitial extends ApiState {}
@@ -15,10 +14,4 @@ class ApiFailure extends ApiState {
   final String message;
 
   ApiFailure({required this.message});
-}
-
-class ApiUrlValidation extends ApiState {
-  final String? error;
-
-  ApiUrlValidation({this.error});
 }
