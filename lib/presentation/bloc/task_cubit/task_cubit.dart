@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:wp_test/presentation/bloc/task_cubit/task_state.dart';
 import 'package:wp_test/models/result.dart';
 import 'package:wp_test/models/task.dart';
@@ -21,15 +22,20 @@ class TaskCubit extends Cubit<TaskState> {
     final tasks = state.tasks;
     int totalTasks = tasks.length;
 
-    emit(TaskCalculationInProgress(progress: 0));
+    emit(TaskCalculationInProgress(progress: 0, tasks));
 
     try {
       for (int i = 0; i < totalTasks; i++) {
         final task = tasks[i];
         task.result = Result.calculateOptimalPath(task);
 
+        debugPrint('========================================');
+        debugPrint('==Result: ${task.result!.path}');
+        debugPrint('==Steps: ${task.result!.steps}');
+        debugPrint('========================================');
+
         double progress = ((i + 1) / totalTasks) * 100;
-        emit(TaskCalculationInProgress(progress: progress.round()));
+        emit(TaskCalculationInProgress(progress: progress.round(), tasks));
       }
 
       emit(TaskCalculationCompleted(tasks: tasks));

@@ -1,24 +1,5 @@
-class GamePoint {
-  final int x;
-  final int y;
-  final String symbol;
-  final bool isAccessible;
+import 'dart:math';
 
-  const GamePoint({
-    required this.x,
-    required this.y,
-    required this.symbol,
-  }) : isAccessible = symbol == '.';
-
-  Map<String, dynamic> toJson() {
-    return {'x': x, 'y': y, 'symbol': symbol};
-  }
-
-  factory GamePoint.fromJson(Map<String, dynamic> json) {
-    return GamePoint(
-      x: json['x'],
-      y: json['y'],
-      symbol: json['symbol'] ?? '!',
-    );
-  }
+class GamePoint extends Point<int> {
+  const GamePoint(super.x, super.y);
 }

@@ -1,6 +1,5 @@
-// ignore_for_file: unused_local_variable
-
 import 'dart:collection';
+import 'package:wp_test/models/game_map.dart';
 import 'package:wp_test/models/game_point.dart';
 import 'package:wp_test/models/task.dart';
 
@@ -11,65 +10,87 @@ class Result {
   Result({required this.steps, required this.path});
 
   static Result calculateOptimalPath(Task task) {
-    final map = task.gameMap; // Get the game map
-    final start = task.start; // Starting point
-    final finish = task.end; // Ending point
+    final start = task.start;
+    final end = task.end;
+    final gameMap = task.gameMap;
 
-    // Check if start or end points are not accessible
-    if (!start.isAccessible || !finish.isAccessible) {
-      return Result(steps: [], path: "No path found");
-    }
+    final Queue<GamePoint> queue = Queue();
+    final Map<GamePoint, GamePoint?> cameFrom = {};
+    final Set<GamePoint> visited = {};
 
-    // Define directions to move (including diagonals)
-    final directions = [
-      GamePoint(x: 0, y: 1, symbol: '.'),
-      GamePoint(x: 1, y: 0, symbol: '.'),
-      GamePoint(x: 0, y: -1, symbol: '.'),
-      GamePoint(x: -1, y: 0, symbol: '.'),
-      GamePoint(x: 1, y: 1, symbol: '.'),
-      GamePoint(x: 1, y: -1, symbol: '.'),
-      GamePoint(x: -1, y: 1, symbol: '.'),
-      GamePoint(x: -1, y: -1, symbol: '.'),
-    ];
-
-    final queue = Queue<List<GamePoint>>(); // Queue for BFS
-    final visited = <GamePoint>{}; // Set to track visited points
-    final parent = <GamePoint, GamePoint>{}; // Map to store parent points
-
-    queue.add([start]); // Start with the starting point
-    visited.add(start); // Mark the start point as visited
+    queue.add(start);
+    cameFrom[start] = null;
+    visited.add(start);
 
     while (queue.isNotEmpty) {
-      final path = queue.removeFirst(); // Get the current path
-      final current = path.last; // Current point in the path
+      final current = queue.removeFirst();
 
-      // Check if we've reached the end point
-      if (current.x == finish.x && current.y == finish.y) {
-        return Result(steps: path, path: _formatPath(path));
+      if (current == end) {
+        return Result(
+          steps: _reconstructPath(cameFrom, current),
+          path: _formatPath(_reconstructPath(cameFrom, current)),
+        );
       }
 
-      // Explore all directions
-      for (var dir in directions) {
-        final newX = current.x + dir.x;
-        final newY = current.y + dir.y;
+      for (var neighbor in _getNeighbors(current, gameMap)) {
+        if (visited.contains(neighbor)) continue;
 
-        try {
-          // Get the next point
-          final nextPoint = map.getPoint(newX, newY);
-
-          // Check if the next point is accessible and not visited
-          if (nextPoint.isAccessible && !visited.contains(nextPoint)) {
-            visited.add(nextPoint); // Mark next point as visited
-            parent[nextPoint] = current; // Set the parent of next point
-            queue.add([...path, nextPoint]); // Add new path to the queue
-          }
-        } catch (e) {
-          // Handle cases where coordinates are out of bounds
-        }
+        queue.add(neighbor);
+        visited.add(neighbor);
+        cameFrom[neighbor] = current;
       }
     }
 
-    return Result(steps: [], path: "No path found");
+    // Якщо шлях не знайдено
+    return Result(
+      steps: [],
+      path: 'No path found',
+    );
+  }
+
+  static List<GamePoint> _reconstructPath(
+    Map<GamePoint, GamePoint?> cameFrom,
+    GamePoint current,
+  ) {
+    final path = <GamePoint>[];
+
+    // ignore: unnecessary_null_comparison
+    while (current != null) {
+      path.add(current);
+      current = cameFrom[current]!;
+    }
+
+    return path.reversed.toList();
+  }
+
+  static List<GamePoint> _getNeighbors(GamePoint point, GameMap gameMap) {
+    final neighbors = <GamePoint>[];
+
+    final directions = [
+      GamePoint(1, 0), // Right
+      GamePoint(-1, 0), // Left
+      GamePoint(0, 1), // Down
+      GamePoint(0, -1), // Up
+      GamePoint(1, 1), // Down-right
+      GamePoint(1, -1), // Down-left
+      GamePoint(-1, 1), // Up-right
+      GamePoint(-1, -1), // Up-left
+    ];
+
+    for (var direction in directions) {
+      final newX = point.x + direction.x;
+      final newY = point.y + direction.y;
+
+      if (newX >= 0 &&
+          newX < gameMap.field.length &&
+          newY >= 0 &&
+          newY < gameMap.field[0].length &&
+          !gameMap.isBlocked(GamePoint(newX, newY))) {
+        neighbors.add(GamePoint(newX, newY));
+      }
+    }
+
+    return neighbors;
   }
 
   static String _formatPath(List<GamePoint> path) {
@@ -78,7 +99,7 @@ class Result {
 
   Map<String, dynamic> toJson() {
     return {
-      'steps': steps.map((e) => e.toJson()).toList(),
+      'steps': steps.map((e) => {'x': e.x, 'y': e.y}).toList(),
       'path': path,
     };
   }
@@ -86,7 +107,7 @@ class Result {
   factory Result.fromJson(Map<String, dynamic> json) {
     return Result(
       steps: (json['steps'] as List<dynamic>)
-          .map((item) => GamePoint.fromJson(item as Map<String, dynamic>))
+          .map((item) => GamePoint(item['x'] as int, item['y'] as int))
           .toList(),
       path: json['path'] as String,
     );

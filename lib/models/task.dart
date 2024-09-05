@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:wp_test/models/game_map.dart';
 import 'package:wp_test/models/game_point.dart';
 import 'package:wp_test/models/result.dart';
@@ -15,15 +14,19 @@ class Task {
     required this.gameMap,
     required this.start,
     required this.end,
-    result,
+    this.result,
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
+    final gameMap = GameMap.createGameMap(json['field']);
+    final start = GamePoint(json['start']['x'], json['start']['y']);
+    final end = GamePoint(json['end']['x'], json['end']['y']);
+
     return Task(
       id: json['id'],
-      gameMap: GameMap.fromDynamicList(json['field']),
-      start: GamePoint.fromJson(json['start']),
-      end: GamePoint.fromJson(json['end']),
+      gameMap: gameMap,
+      start: start,
+      end: end,
     );
   }
 }

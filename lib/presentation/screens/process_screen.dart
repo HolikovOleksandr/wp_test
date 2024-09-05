@@ -28,31 +28,69 @@ class _ProcessScreenState extends State<ProcessScreen> {
       body: BlocBuilder<TaskCubit, TaskState>(
         builder: (context, state) {
           if (state is TaskCalculationInProgress) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(value: state.progress / 100),
-                  SizedBox(height: 20),
-                  Text('Progress: ${state.progress}%'),
-                ],
-              ),
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(value: state.progress / 100),
+                      SizedBox(height: 20),
+                      Text('Progress: ${state.progress}%'),
+                      SizedBox(height: 20),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: state.tasks.length,
+                          itemBuilder: (context, index) {
+                            final task = state.tasks[index];
+                            return ListTile(
+                              title: Text('Task ${task.id}'),
+                              subtitle:
+                                  Text('Field: ${task.gameMap.toString()}'),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             );
           }
 
           if (state is TaskCalculationCompleted) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Calculation Completed'),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => debugPrint(state.tasks.toString()),
-                    child: Text('Send results to server'),
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Calculation Completed'),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => debugPrint(state.tasks.toString()),
+                        child: Text('Send results to server'),
+                      ),
+                      SizedBox(height: 20),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: state.tasks.length,
+                          itemBuilder: (context, index) {
+                            final task = state.tasks[index];
+                            return ListTile(
+                              title: Text('Task ${task.id}'),
+                              subtitle:
+                                  Text('Field: ${task.gameMap.toString()}'),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             );
           }
 
@@ -61,7 +99,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Text('Error: ${state.error}'),
+                  Text('Error occurred! Please try again.'),
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
