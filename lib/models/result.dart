@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'package:flutter/material.dart';
 import 'package:wp_test/models/game_map.dart';
 import 'package:wp_test/models/game_point.dart';
 import 'package:wp_test/models/task.dart';
@@ -10,6 +11,7 @@ class Result {
   Result({required this.steps, required this.path});
 
   static Result calculateOptimalPath(Task task) {
+    debugPrint('[calculateOptimalPath] start');
     final start = task.start;
     final end = task.end;
     final gameMap = task.gameMap;
@@ -18,17 +20,16 @@ class Result {
     final Map<GamePoint, GamePoint?> cameFrom = {};
     final Set<GamePoint> visited = {};
 
-    queue.add(start);
-    cameFrom[start] = null;
-    visited.add(start);
+    cameFrom.addAll(_initializeAlgorithm(start, queue, visited));
 
     while (queue.isNotEmpty) {
       final current = queue.removeFirst();
 
       if (current == end) {
+        final path = _reconstructPath(cameFrom, current);
         return Result(
-          steps: _reconstructPath(cameFrom, current),
-          path: _formatPath(_reconstructPath(cameFrom, current)),
+          steps: path,
+          path: _formatPath(path),
         );
       }
 
@@ -39,31 +40,54 @@ class Result {
         visited.add(neighbor);
         cameFrom[neighbor] = current;
       }
+      debugPrint('[calculateOptimalPath] end');
     }
 
-    // Якщо шлях не знайдено
-    return Result(
-      steps: [],
-      path: 'No path found',
-    );
+    debugPrint('[calculateOptimalPath] No path found');
+    return Result(steps: [], path: 'No path found');
+  }
+
+  static Map<GamePoint, GamePoint?> _initializeAlgorithm(
+    GamePoint start,
+    Queue<GamePoint> queue,
+    Set<GamePoint> visited,
+  ) {
+    final cameFrom = <GamePoint, GamePoint?>{};
+    debugPrint('[_initializeAlgorithm] Start');
+
+    queue.add(start);
+    cameFrom[start] = null;
+    visited.add(start);
+
+    debugPrint('[_initializeAlgorithm] End');
+    return cameFrom;
   }
 
   static List<GamePoint> _reconstructPath(
     Map<GamePoint, GamePoint?> cameFrom,
     GamePoint current,
   ) {
+    debugPrint('[_reconstructPath] Start');
     final path = <GamePoint>[];
 
-    // ignore: unnecessary_null_comparison
-    while (current != null) {
+    while (cameFrom.containsKey(current)) {
       path.add(current);
-      current = cameFrom[current]!;
+      final previous = cameFrom[current];
+
+      if (previous == null) {
+        debugPrint('[_reconstructPath] Error: current has no previous');
+        break;
+      }
+
+      current = previous;
     }
 
+    debugPrint('[_reconstructPath] End');
     return path.reversed.toList();
   }
 
   static List<GamePoint> _getNeighbors(GamePoint point, GameMap gameMap) {
+    debugPrint('[_getNeighbors] Start');
     final neighbors = <GamePoint>[];
 
     final directions = [
@@ -90,6 +114,7 @@ class Result {
       }
     }
 
+    debugPrint('[_getNeighbors] End');
     return neighbors;
   }
 

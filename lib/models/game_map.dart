@@ -32,4 +32,12 @@ class GameMap {
 
     return GameMap(field);
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'field': field
+          .map((row) => row.map((point) => point.toJson()).toList())
+          .toList(),
+    };
+  }
 }

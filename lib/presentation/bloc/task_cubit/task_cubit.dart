@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:wp_test/presentation/bloc/task_cubit/task_state.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:wp_test/models/result.dart';
 import 'package:wp_test/models/task.dart';
-import 'package:bloc/bloc.dart';
 
-class TaskCubit extends Cubit<TaskState> {
+class TaskCubit extends HydratedCubit<TaskState> {
   TaskCubit() : super(TaskInitial());
+  final Logger _logger = Logger();
 
   void setTasks(List<Task> tasks) {
     emit(TaskLoaded(tasks: tasks));
@@ -15,32 +16,49 @@ class TaskCubit extends Cubit<TaskState> {
     final state = this.state;
 
     if (state is! TaskLoaded) {
-      emit(TaskError(error: "No tasks available to calculate."));
+      emit(TaskError(error: "No tasks available to calculate"));
       return;
     }
 
     final tasks = state.tasks;
-    int totalTasks = tasks.length;
 
-    emit(TaskCalculationInProgress(progress: 0, tasks));
+    emit(TaskCalculationInProgress(progress: 0, tasks: tasks));
 
     try {
-      for (int i = 0; i < totalTasks; i++) {
+      for (int i = 0; i < tasks.length; i++) {
         final task = tasks[i];
         task.result = Result.calculateOptimalPath(task);
+        _logger.d("!!!!!!!!!" + tasks[i].result!.steps.toString());
 
-        debugPrint('========================================');
-        debugPrint('==Result: ${task.result!.path}');
-        debugPrint('==Steps: ${task.result!.steps}');
-        debugPrint('========================================');
+        double progress = ((i + 1) / tasks.length) * 100;
 
-        double progress = ((i + 1) / totalTasks) * 100;
-        emit(TaskCalculationInProgress(progress: progress.round(), tasks));
+        emit(TaskCalculationInProgress(
+          progress: progress.round(),
+          tasks: tasks,
+        ));
       }
-
       emit(TaskCalculationCompleted(tasks: tasks));
     } catch (e) {
       emit(TaskError(error: e.toString()));
     }
+  }
+
+  @override
+  TaskState fromJson(Map<String, dynamic> json) {
+    final tasksJson = json['tasks'] as List<dynamic>?;
+    if (tasksJson == null) return TaskInitial();
+
+    final tasks = tasksJson
+        .map((taskJson) => Task.fromJson(taskJson as Map<String, dynamic>))
+        .toList();
+
+    return TaskLoaded(tasks: tasks);
+  }
+
+  @override
+  Map<String, dynamic>? toJson(TaskState state) {
+    return state is TaskLoaded
+        ? {'tasks': state.tasks.map((task) => task.toJson()).toList()}
+        : null;
   }
 }

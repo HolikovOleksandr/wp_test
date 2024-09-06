@@ -23,7 +23,7 @@ class TaskCalculationInProgress extends TaskState {
   final int progress;
   final List<Task> tasks;
 
-  TaskCalculationInProgress(this.tasks, {required this.progress});
+  TaskCalculationInProgress({required this.tasks, required this.progress});
 
   @override
   List<Object> get props => [progress];

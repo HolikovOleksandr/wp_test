@@ -31,7 +31,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(
+                Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -63,31 +63,26 @@ class _ProcessScreenState extends State<ProcessScreen> {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Calculation Completed'),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () => debugPrint(state.tasks.toString()),
-                        child: Text('Send results to server'),
-                      ),
-                      SizedBox(height: 20),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: state.tasks.length,
-                          itemBuilder: (context, index) {
-                            final task = state.tasks[index];
-                            return ListTile(
-                              title: Text('Task ${task.id}'),
-                              subtitle:
-                                  Text('Field: ${task.gameMap.toString()}'),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
+                Text('Calculation Completed'),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    debugPrint('Results: ${state.tasks}');
+                    // Logic to send results to the server
+                  },
+                  child: Text('Send results to server'),
+                ),
+                SizedBox(height: 20),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: state.tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = state.tasks[index];
+                      return ListTile(
+                        title: Text('Task ${task.id}'),
+                        subtitle: Text('Field: ${task.gameMap.toString()}'),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -99,7 +94,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Error occurred! Please try again.'),
+                  Text('Error occurred: ${state.error}'),
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -112,13 +107,14 @@ class _ProcessScreenState extends State<ProcessScreen> {
             );
           }
 
+          // Initial state or any other state
           return Center(
             child: ElevatedButton(
-              onPressed: () {
-                final result =
-                    context.read<TaskCubit>().findResultsForEachTask();
-                debugPrint(result.toString());
-              },
+              onPressed: state is! TaskCalculationInProgress
+                  ? () {
+                      context.read<TaskCubit>().findResultsForEachTask();
+                    }
+                  : null, 
               child: Text('Start Calculation'),
             ),
           );

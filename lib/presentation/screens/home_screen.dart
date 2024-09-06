@@ -52,14 +52,10 @@ class _HomeScreenState extends State<HomeScreen> {
         // ========== Only during development =============
         leading: IconButton(
           onPressed: () {
-            setState(
-              () => _inputController.text =
-                  'https://flutter.webspark.dev/flutter/api',
-            );
+            setState(() => _inputController.text =
+                'https://flutter.webspark.dev/flutter/api');
           },
-          icon: Icon(
-            Icons.arrow_downward_rounded,
-          ),
+          icon: Icon(Icons.arrow_downward_rounded),
         ),
         // ================================================
         title: Text(
@@ -72,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (state is ApiSuccess<List<Task>>) {
             context.read<TaskCubit>().setTasks(state.data);
             Navigator.of(context).pushNamed('/process');
+            // Navigator.of(context).pushNamed('/test');
           } else if (state is ApiFailure) {
             _showSnackbar('Error: ${state.message}');
           }

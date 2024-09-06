@@ -18,10 +18,7 @@ class DataProvider {
 
       if (error) return ApiResponse(error: true, message: message, data: null);
 
-      final List<Task> tasks = data.map((i) => Task.fromJson(i)).toList();
-      for (var task in tasks) {
-        debugPrint(task.toString());
-      }
+      final List<Task> tasks = data.map((i) => Task.fromJson(i)).toList();      
       return ApiResponse(error: error, message: message, data: tasks);
     } catch (e) {
       debugPrint(e.toString());

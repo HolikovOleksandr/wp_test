@@ -22,11 +22,25 @@ class Task {
     final start = GamePoint(json['start']['x'], json['start']['y']);
     final end = GamePoint(json['end']['x'], json['end']['y']);
 
+    final result =
+        json['result'] != null ? Result.fromJson(json['result']) : null;
+
     return Task(
       id: json['id'],
       gameMap: gameMap,
       start: start,
       end: end,
+      result: result,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'gameMap': gameMap.toJson(),
+      'start': {'x': start.x, 'y': start.y},
+      'end': {'x': end.x, 'y': end.y},
+      'result': result?.toJson(),
+    };
   }
 }
