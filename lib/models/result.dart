@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'package:flutter/material.dart';
 import 'package:wp_test/models/game_map.dart';
 import 'package:wp_test/models/game_point.dart';
 import 'package:wp_test/models/task.dart';
@@ -11,7 +10,6 @@ class Result {
   Result({required this.steps, required this.path});
 
   static Result calculateOptimalPath(Task task) {
-    debugPrint('[calculateOptimalPath] start');
     final start = task.start;
     final end = task.end;
     final gameMap = task.gameMap;
@@ -40,10 +38,8 @@ class Result {
         visited.add(neighbor);
         cameFrom[neighbor] = current;
       }
-      debugPrint('[calculateOptimalPath] end');
     }
 
-    debugPrint('[calculateOptimalPath] No path found');
     return Result(steps: [], path: 'No path found');
   }
 
@@ -53,13 +49,11 @@ class Result {
     Set<GamePoint> visited,
   ) {
     final cameFrom = <GamePoint, GamePoint?>{};
-    debugPrint('[_initializeAlgorithm] Start');
 
     queue.add(start);
     cameFrom[start] = null;
     visited.add(start);
 
-    debugPrint('[_initializeAlgorithm] End');
     return cameFrom;
   }
 
@@ -67,27 +61,20 @@ class Result {
     Map<GamePoint, GamePoint?> cameFrom,
     GamePoint current,
   ) {
-    debugPrint('[_reconstructPath] Start');
     final path = <GamePoint>[];
 
     while (cameFrom.containsKey(current)) {
       path.add(current);
       final previous = cameFrom[current];
 
-      if (previous == null) {
-        debugPrint('[_reconstructPath] Error: current has no previous');
-        break;
-      }
-
+      if (previous == null) break;
       current = previous;
     }
 
-    debugPrint('[_reconstructPath] End');
     return path.reversed.toList();
   }
 
   static List<GamePoint> _getNeighbors(GamePoint point, GameMap gameMap) {
-    debugPrint('[_getNeighbors] Start');
     final neighbors = <GamePoint>[];
 
     final directions = [
@@ -114,7 +101,6 @@ class Result {
       }
     }
 
-    debugPrint('[_getNeighbors] End');
     return neighbors;
   }
 

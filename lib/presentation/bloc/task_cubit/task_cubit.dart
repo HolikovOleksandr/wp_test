@@ -1,4 +1,4 @@
-import 'package:logger/logger.dart';
+import 'package:flutter/material.dart';
 import 'package:wp_test/presentation/bloc/task_cubit/task_state.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:wp_test/models/result.dart';
@@ -6,7 +6,6 @@ import 'package:wp_test/models/task.dart';
 
 class TaskCubit extends HydratedCubit<TaskState> {
   TaskCubit() : super(TaskInitial());
-  final Logger _logger = Logger();
 
   void setTasks(List<Task> tasks) {
     emit(TaskLoaded(tasks: tasks));
@@ -26,21 +25,33 @@ class TaskCubit extends HydratedCubit<TaskState> {
 
     try {
       for (int i = 0; i < tasks.length; i++) {
-        final task = tasks[i];
-        task.result = Result.calculateOptimalPath(task);
-        _logger.d("!!!!!!!!!" + tasks[i].result!.steps.toString());
+        tasks[i].result = Result.calculateOptimalPath(tasks[i]);
+        int progress = (((i + 1) / tasks.length) * 100).round();
 
-        double progress = ((i + 1) / tasks.length) * 100;
-
-        emit(TaskCalculationInProgress(
-          progress: progress.round(),
-          tasks: tasks,
-        ));
+        emit(TaskCalculationInProgress(progress: progress, tasks: tasks));
       }
       emit(TaskCalculationCompleted(tasks: tasks));
     } catch (e) {
       emit(TaskError(error: e.toString()));
     }
+  }
+
+  void createApiRequest() {
+    final state = this.state;
+
+    if (state is! TaskCalculationCompleted) {
+      throw Exception('Tasks are not completed');
+    }
+
+    final tasks = state.tasks;
+    final steps = tasks.expand((t) => t.result?.steps ?? []).toList();
+    debugPrint(":::>>>" + steps.runtimeType.toString());
+
+    // return ApiRequest(
+    //   id: 'unique-id',
+    //   steps: steps,
+    //   path: 'your-path',
+    // );
   }
 
   @override

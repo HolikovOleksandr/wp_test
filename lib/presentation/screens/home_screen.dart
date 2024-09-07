@@ -30,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showSnackbar(String message) {
+    debugPrint('[HomeScreen] :":>>>' + message);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -65,12 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: BlocConsumer<ApiBloc, ApiState>(
         listener: (context, state) {
-          if (state is ApiSuccess<List<Task>>) {
+          if (state is ApiSuccessGet<List<Task>>) {
             context.read<TaskCubit>().setTasks(state.data);
             Navigator.of(context).pushNamed('/process');
-            // Navigator.of(context).pushNamed('/test');
           } else if (state is ApiFailure) {
-            _showSnackbar('Error: ${state.message}');
+            _showSnackbar(state.message);
           }
         },
         builder: (context, state) {
@@ -95,9 +96,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     PrimaryButton(
                       text: 'Start',
                       onPressed: () {
-                        context
-                            .read<ApiBloc>()
-                            .add(FetchTasks(endpoint: _inputController.text));
+                        context.read<ApiBloc>().add(
+                              FetchTasks(endpoint: _inputController.text),
+                            );
                       },
                     ),
                   ],

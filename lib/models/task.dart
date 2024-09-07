@@ -1,12 +1,12 @@
 import 'package:wp_test/models/game_map.dart';
 import 'package:wp_test/models/game_point.dart';
 import 'package:wp_test/models/result.dart';
+import 'package:wp_test/models/send_task_dto.dart';
 
 class Task {
   final String id;
   final GameMap gameMap;
-  final GamePoint start;
-  final GamePoint end;
+  final GamePoint start, end;
   Result? result;
 
   Task({
@@ -32,6 +32,12 @@ class Task {
       end: end,
       result: result,
     );
+  }
+
+  SendTaskDto toSendTaskDto() {
+    return result != null
+        ? SendTaskDto(id: id, result: result!)
+        : throw Exception('Task result is null');
   }
 
   Map<String, dynamic> toJson() {

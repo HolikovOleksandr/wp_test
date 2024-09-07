@@ -4,10 +4,16 @@ class ApiInitial extends ApiState {}
 
 class ApiLoading extends ApiState {}
 
-class ApiSuccess<T> extends ApiState {
+class ApiSuccessPost extends ApiState {
+  final String message;
+
+  ApiSuccessPost({required this.message});
+}
+
+class ApiSuccessGet<T> extends ApiState {
   final T data;
 
-  ApiSuccess({required this.data});
+  ApiSuccessGet({required this.data});
 }
 
 class ApiFailure extends ApiState {

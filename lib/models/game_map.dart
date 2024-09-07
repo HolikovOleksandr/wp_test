@@ -33,6 +33,14 @@ class GameMap {
     return GameMap(field);
   }
 
+  String visualize() {
+    return field.map((row) {
+      return row.map((point) {
+        return point.toString();
+      }).join();
+    }).join('\n');
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'field': field
