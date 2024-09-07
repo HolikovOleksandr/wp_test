@@ -9,7 +9,7 @@ class GameMap {
         point.x < field.length &&
         point.y >= 0 &&
         point.y < field[0].length) {
-      return field[point.x][point.y].toString();
+      return field[point.x][point.y].symbol ?? '.';
     } else {
       throw ArgumentError('Invalid coordinates');
     }
@@ -26,7 +26,7 @@ class GameMap {
       stringField.length,
       (x) => List<GamePoint>.generate(
         stringField[x].length,
-        (y) => GamePoint(x, y),
+        (y) => GamePoint(x, y, stringField[x][y]),
       ),
     );
 
@@ -36,7 +36,7 @@ class GameMap {
   String visualize() {
     return field.map((row) {
       return row.map((point) {
-        return point.toString();
+        return point.symbol ?? '.';
       }).join();
     }).join('\n');
   }

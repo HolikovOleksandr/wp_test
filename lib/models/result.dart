@@ -23,6 +23,7 @@ class Result {
     while (queue.isNotEmpty) {
       final current = queue.removeFirst();
 
+      // Якщо досягли кінцевої точки
       if (current == end) {
         final path = _reconstructPath(cameFrom, current);
         return Result(
@@ -31,6 +32,7 @@ class Result {
         );
       }
 
+      // Перевірка сусідніх точок
       for (var neighbor in _getNeighbors(current, gameMap)) {
         if (visited.contains(neighbor)) continue;
 
@@ -74,18 +76,19 @@ class Result {
     return path.reversed.toList();
   }
 
+  /// Оновлена логіка для отримання сусідів, враховуючи символи точок
   static List<GamePoint> _getNeighbors(GamePoint point, GameMap gameMap) {
     final neighbors = <GamePoint>[];
 
     final directions = [
-      GamePoint(1, 0), // Right
-      GamePoint(-1, 0), // Left
-      GamePoint(0, 1), // Down
-      GamePoint(0, -1), // Up
-      GamePoint(1, 1), // Down-right
-      GamePoint(1, -1), // Down-left
-      GamePoint(-1, 1), // Up-right
-      GamePoint(-1, -1), // Up-left
+      GamePoint(1, 0, '.'), // Праворуч
+      GamePoint(-1, 0, '.'), // Ліворуч
+      GamePoint(0, 1, '.'), // Вниз
+      GamePoint(0, -1, '.'), // Вгору
+      GamePoint(1, 1, '.'), // Право-вниз (по діагоналі)
+      GamePoint(1, -1, '.'), // Право-вгору (по діагоналі)
+      GamePoint(-1, 1, '.'), // Ліво-вниз (по діагоналі)
+      GamePoint(-1, -1, '.'), // Ліво-вгору (по діагоналі)
     ];
 
     for (var direction in directions) {
@@ -95,9 +98,12 @@ class Result {
       if (newX >= 0 &&
           newX < gameMap.field.length &&
           newY >= 0 &&
-          newY < gameMap.field[0].length &&
-          !gameMap.isBlocked(GamePoint(newX, newY))) {
-        neighbors.add(GamePoint(newX, newY));
+          newY < gameMap.field[0].length) {
+        // Перевірка, чи не заблокована точка (символ X)
+        final neighborPoint = gameMap.field[newX][newY];
+        if (neighborPoint.symbol != 'X') {
+          neighbors.add(neighborPoint);
+        }
       }
     }
 
