@@ -76,19 +76,18 @@ class Result {
     return path.reversed.toList();
   }
 
-  /// Оновлена логіка для отримання сусідів, враховуючи символи точок
   static List<GamePoint> _getNeighbors(GamePoint point, GameMap gameMap) {
     final neighbors = <GamePoint>[];
 
     final directions = [
-      GamePoint(1, 0, '.'), // Праворуч
-      GamePoint(-1, 0, '.'), // Ліворуч
-      GamePoint(0, 1, '.'), // Вниз
-      GamePoint(0, -1, '.'), // Вгору
-      GamePoint(1, 1, '.'), // Право-вниз (по діагоналі)
-      GamePoint(1, -1, '.'), // Право-вгору (по діагоналі)
-      GamePoint(-1, 1, '.'), // Ліво-вниз (по діагоналі)
-      GamePoint(-1, -1, '.'), // Ліво-вгору (по діагоналі)
+      GamePoint(1, 0),
+      GamePoint(-1, 0),
+      GamePoint(0, 1),
+      GamePoint(0, -1),
+      GamePoint(1, 1),
+      GamePoint(1, -1),
+      GamePoint(-1, 1),
+      GamePoint(-1, -1),
     ];
 
     for (var direction in directions) {
@@ -99,8 +98,8 @@ class Result {
           newX < gameMap.field.length &&
           newY >= 0 &&
           newY < gameMap.field[0].length) {
-        // Перевірка, чи не заблокована точка (символ X)
         final neighborPoint = gameMap.field[newX][newY];
+
         if (neighborPoint.symbol != 'X') {
           neighbors.add(neighborPoint);
         }
