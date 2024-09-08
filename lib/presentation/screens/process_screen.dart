@@ -64,19 +64,14 @@ class _ProcessScreenState extends State<ProcessScreen> {
                     PrimaryButton(
                       text: 'Send results to server',
                       onPressed: () async {
-                        try {
-                          final List<SendTaskDto> sendTasks = tasks
-                              .map((task) => task.toSendTaskDto())
-                              .toList();
+                        final List<SendTaskDto> sendTasks =
+                            tasks.map((task) => task.toSendTaskDto()).toList();
 
-                          context
-                              .read<ApiBloc>()
-                              .add(SendResults(tasks: sendTasks));
+                        context
+                            .read<ApiBloc>()
+                            .add(SendResults(tasks: sendTasks));
 
-                          Navigator.of(context).pushNamed('/results');
-                        } catch (e) {
-                          debugPrint('[ProcessScreen] :::>>>' + e.toString());
-                        }
+                        Navigator.of(context).pushReplacementNamed('/results');
                       },
                     ),
                   ],

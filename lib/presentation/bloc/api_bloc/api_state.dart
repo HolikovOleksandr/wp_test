@@ -12,8 +12,9 @@ class ApiSuccessPost extends ApiState {
 
 class ApiSuccessGet<T> extends ApiState {
   final T data;
+  final String endpoint;
 
-  ApiSuccessGet({required this.data});
+  ApiSuccessGet({required this.data, required this.endpoint});
 }
 
 class ApiFailure extends ApiState {

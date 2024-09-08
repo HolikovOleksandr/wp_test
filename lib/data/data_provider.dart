@@ -32,17 +32,14 @@ class DataProvider {
 
   static Future<bool> postRequest({
     required List<SendTaskDto> tasks,
-    String? endpoint,
+    required String endpoint,
   }) async {
-    final String finalEndpoint =
-        endpoint ?? 'https://flutter.webspark.dev/flutter/api';
-
     try {
       final List<Map<String, dynamic>> tasksJson =
           tasks.map((t) => t.toJson()).toList();
 
       final response = await http.post(
-        Uri.parse(finalEndpoint),
+        Uri.parse(endpoint),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(tasksJson),
       );

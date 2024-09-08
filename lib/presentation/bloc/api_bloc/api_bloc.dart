@@ -24,7 +24,8 @@ class ApiBloc extends Bloc<ApiEvent, ApiState> {
           debugPrint("[ApiBloc] :::>>>" + response.message);
         } else {
           taskCubit.setTasks(response.data!);
-          emit(ApiSuccessGet<List<Task>>(data: response.data!));
+          emit(ApiSuccessGet<List<Task>>(
+              data: response.data!, endpoint: event.endpoint));
 
           debugPrint("[ApiBloc] First task :::>>>" +
               response.data![0].gameMap.visualize());
@@ -36,15 +37,23 @@ class ApiBloc extends Bloc<ApiEvent, ApiState> {
 
     on<SendResults>((event, emit) async {
       try {
-        final bool success = await DataProvider.postRequest(
-            tasks: event.tasks, endpoint: event.endpoint);
+        final apiState = state;
+        if (apiState is ApiSuccessGet) {
+          final success = await DataProvider.postRequest(
+            endpoint: apiState.endpoint,
+            tasks: event.tasks,
+          );
 
-        debugPrint('[ApiBloc] First answer :::>>> ${event.tasks[0].toJson()}');
+          debugPrint(
+              '[ApiBloc] First answer :::>>> ${event.tasks[0].toJson()}');
 
-        if (success) {
-          emit(ApiSuccessPost(message: 'Results successfully sent'));
+          if (success) {
+            emit(ApiSuccessPost(message: 'Results successfully sent'));
+          } else {
+            emit(ApiFailure(message: 'Failed to send results'));
+          }
         } else {
-          emit(ApiFailure(message: 'Failed to send results'));
+          emit(ApiFailure(message: 'No endpoint available'));
         }
       } catch (e) {
         emit(ApiFailure(message: e.toString()));
