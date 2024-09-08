@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:wp_test/presentation/bloc/task_cubit/task_state.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:wp_test/models/result.dart';
@@ -34,24 +33,6 @@ class TaskCubit extends HydratedCubit<TaskState> {
     } catch (e) {
       emit(TaskError(error: e.toString()));
     }
-  }
-
-  void createApiRequest() {
-    final state = this.state;
-
-    if (state is! TaskCalculationCompleted) {
-      throw Exception('Tasks are not completed');
-    }
-
-    final tasks = state.tasks;
-    final steps = tasks.expand((t) => t.result?.steps ?? []).toList();
-    debugPrint(":::>>>" + steps.runtimeType.toString());
-
-    // return ApiRequest(
-    //   id: 'unique-id',
-    //   steps: steps,
-    //   path: 'your-path',
-    // );
   }
 
   @override

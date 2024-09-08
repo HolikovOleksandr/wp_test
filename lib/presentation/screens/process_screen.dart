@@ -72,6 +72,8 @@ class _ProcessScreenState extends State<ProcessScreen> {
                           context
                               .read<ApiBloc>()
                               .add(SendResults(tasks: sendTasks));
+
+                          Navigator.of(context).pushNamed('/results');
                         } catch (e) {
                           debugPrint('[ProcessScreen] :::>>>' + e.toString());
                         }
