@@ -53,7 +53,14 @@ class _TaskListItemState extends State<TaskListItem> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              '/preview',
+              arguments: {
+                'task': widget.task,
+              },
+            );
+          },
         ),
       ),
     );

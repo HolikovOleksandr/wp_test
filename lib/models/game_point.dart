@@ -12,5 +12,5 @@ class GamePoint extends Point<int> {
   Map<String, dynamic> toJson() => {'x': x, 'y': y, 'symbol': symbol};
 
   @override
-  String toString() => symbol != null ? symbol! : '($x, $y)';
+  String toString() => '($x, $y)';
 }
