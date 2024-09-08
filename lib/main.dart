@@ -4,8 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wp_test/helpers/app_bloc_observer.dart';
-import 'package:wp_test/presentation/bloc/api_bloc/api_bloc.dart';
-import 'package:wp_test/presentation/bloc/task_cubit/task_cubit.dart';
+import 'package:wp_test/helpers/my_blocs_providers.dart';
 import 'package:wp_test/presentation/router/app_router.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -36,10 +35,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => TaskCubit()),
-        BlocProvider(create: (context) => ApiBloc(taskCubit: TaskCubit())),
-      ],
+      providers: MyBlocProviders.providers,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         onGenerateRoute: _appRouter.onGeneratedRoute,
